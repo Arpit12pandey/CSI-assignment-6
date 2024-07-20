@@ -3,6 +3,7 @@ const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 const userRouter = require('./routes/user');
 const dotenv =require('dotenv');
+const protectedRouter = require('./routes/protected');
 dotenv.config();
 
 const app = express();
@@ -20,5 +21,6 @@ mongoose.connect(process.env.MONGO_URI).then(()=>{
 
 // Routes
 app.use('/users', userRouter);
+app.use('/users', protectedRouter);
 
 module.exports = app;

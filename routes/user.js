@@ -1,7 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const User = require('../models/User');
-
+const auth = require('../middleware/auth');
+const { generateToken } = require('../utils/jwt');
 // Create a new user
 router.post('/', async (req, res) => {
   try {
@@ -48,7 +49,17 @@ router.patch('/:id', async (req, res) => {
     res.status(400).send(error);
   }
 });
-
+router.post('/users/login', async (req, res) => {
+  try {
+    const user = await User.findByCredentials(req.body.username, req.body.password);
+    const token = generateToken(user._id);
+    user.tokens = user.tokens.concat({ token });
+    await user.save();
+    res.send({ user, token });
+  } catch (error) {
+    res.status(400).send();
+  }
+});
 // Delete a user by ID
 router.delete('/:id', async (req, res) => {
   try {
@@ -61,5 +72,6 @@ router.delete('/:id', async (req, res) => {
     res.status(500).send(error);
   }
 });
+
 
 module.exports = router;
